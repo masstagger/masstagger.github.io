@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<!-- saved from url=(0038)https://absurdlyobfuscated.com/tagger/ -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Subreddit Tagger</title>
+<style>
+html {color: #DDD; background: #111; font-family: sans-serif}
+body {margin: 1em;}
+a:link {color: #5AF;}
+a:visited {color: #27C;}
+a:hover {color: #8DF;}
+img {border-style: none;}
+.i {text-indent: 2em;}
+.r {display: table-row;}
+.c {display: table-cell; padding: 0.25em;}
+#t {text-align: right; font-size: small; margin-bottom: 1em;}
+#h {text-align: center; font-size: large;}
+#m {float: right; min-width: 10em; margin-left: 1em; margin-bottom: 1em; padding: 0.5em; border: solid 1px #DDD;}
+#m .mi {list-style-type: none; margin: 0em; padding: 0em;}
+#m .i {text-indent: 0em; margin-left: 2em;}
+.mh {margin-bottom: 1em; font-style: italic;}
+#c {padding-bottom: 2em;}
+#pm, #pv {font-style: italic;}
+#pv {float: right; text-align: right; min-width: 8em; margin-left: 1em;}
+@media print {#m, #t {display: none;} html {color: #000; background: #FFF; margin: 0em;}}
+
+.help {width: 80%;}
+.helpTitle {font-weight: bold; font-style: italic;}
+.helpTitle, .helpExpand {display: inline;}
+.helpExpand {width: 1em; padding-right: 0.5em;}
+.helpExpand a {cursor: pointer;}
+.helpContent {padding: 1em;}
+.tags {width: 35em; padding: 1em 0;}
+.tagLbl {width: 6.5em; padding-right: 1em;}
+.tagInput {width: 6.5em;}
+.tagLbl, .tagInput {display: inline-block; text-align: left;}
+.tagSection {width: 35em; padding: 1em 0;}
+.optLine {text-align: center; line-height: 1.31em;}
+.optLbl {width: 11em;}
+.optLblW {width: 18.5em;}
+.optInput {width: 7em;}
+.optLbl, .optLblW, .optInput {display: inline-block; text-align: left; vertical-align: top;}
+.saveOptLine {width: 35em; padding-bottom: 1em;}
+.saveOptLbl {width: 35em;}
+.saveOptInput {padding-right: 1em;}
+.saveOptInput select {width: 13em;}
+.saveOptLine, .saveOptInput, .saveOptBtns {display: inline-block;}
+.title {font-weight: bold; padding-bottom: 1em;}
+.center {text-align: center;}
+.padTop {padding-top: 1em;}
+.bold {text-decoration: none; font-weight: bold;}
+.block {font-family: monospace;}
+.bold, .block {display: inline;}
+#newTags, #oldTags {height: 18em; width: 35em;}
+#messages {height: 14em; width: 30em;}
+#userList {height: 15.4em; width: 23em;}
+#ignoreList {height: 15.4em; width: 23em;}
+.outSection {width: 32em; text-align: center;}
+.mainSection {display: inline-block; vertical-align: top; padding: 0 0.5em;}
+.lbl {padding-top: 1em; font-style: italic; color: #888;}
+input[type=text], select {width: 7.5em;}
+textarea, input[type=text], select {background: #DDD; border: 1px solid #888; border-radius: 2px;}
+hr.separator {height: 1px; width: 35em; border-width: 1px 0 0 0; border-color: #888;}
+</style>
+</head>
+<body>
+<div id="c">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jscolor/2.0.4/jscolor.js"></script>
+<script src="https://cdn.rawgit.com/madmurphy/cookies.js/master/cookies_min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.3/FileSaver.min.js"></script>
+<script type="text/javascript">
+/*
+  Subreddit Tagger by absurdlyobfuscated
+  Edited by me on 24/01/2018
+  
+  This software is released to the public domain.
+*/
+
+$(document).ready(function(){
+$("#newTags").prop("value", "");
+$("#messages").prop("value", "");
+var ignoreList = "";
+for (var i in bots) {
+	ignoreList += bots[i] + "\n";
+}
+$("#ignoreList").prop("value", ignoreList);
+updateBG($("#color")[0]);
+updateLinksFrom();
+getSavedTagOptions();});
+							 
+var tagData, savedTagOptions = [], aborting = false, bots = [
+"AutoModerator",
+"TotesMessenger",
+"totes_meta_bot",
+"SnapshillBot",
+"RemindMeBot",
+"youtubefactsbot",
+"_youtubot_",
+"video_descriptionbot",
+"friendly-bot",
+"metric_units",
+"stabbot",
+"stabbot_crop",
+"clickablelinkbot",
+"sneakpeekbot",
+"TweetsInCommentsBot",
+"imguralbumbot",
+"xkcd_transcriber",
+"auto-xkcd37",
+"RedditSilverBot",
+"garlicbot",
+"cheer-bot",
+"cheer_up_bot",
+"friendly-bot",
+"morejpeg_auto",
+"QuoteMe-Bot",
+"DeepFryBot",
+"GoodBot_BadBot",
+"HelperBot_",
+"WikiTextBot",
+"anti-gif-bot",
+"ColorizeThis",
+"phonebatterylevelbot",
+"jacksfilmsbot",
+"haiku-detector",
+"haikubot-1911",
+"I_am_a_haiku_bot",
+"LiveTwitchClips",
+"ThisCatMightCheerYou",
+"autotldr",
+"perrycohen",
+"Good_Good_GB_BB",
+"SeriouslyWhenIsHL3",
+"OctupusFunFacts",
+"PicDescriptionBot",
+"PORTMANTEAU-BOT",
+"AnimalFactsBot",
+"DrunkANimalFactBot",
+"AreYouDeaf",
+"news-summary",
+"tiny_smile_bot",
+"Factorial-Bot",
+"table_it_bot",
+"DreamProcessor",
+"MultiUseBot",
+"PayRespects-Bot",
+"darthplagueisbot",
+"lyrics-matcher-bot",
+"EyeBleachBot",
+"GoodMod_BadMod",
+"theHelperdroid",
+"MovieGuide",
+"auto-xkcd37",
+"timestamp_bot",
+"WhoDidThisBot",
+"TipJarBot",
+"tippr",
+"election_info_bot",
+"opfeels",
+"SmallSubBot",
+"hug-bot",
+"MassdropBot",
+"rosey-the-bot",
+"The-Paranoid-Android",
+"Gfycat_Details_Fixer",
+"gifv-bot",
+"NFLVideoConverterBot",
+"MLBVideoConverterBot",
+"OctopusFunFacts",
+"ILinkNSFWSubreddits",
+"image_linker_bot",
+"vredditmirrorbot",
+"JiffierBot",
+"TwitterToStreamable",
+"RedditStreamable",
+"RiskyClickerBot",
+"SteamNewsBot",
+"TumblrDirect",
+"Gyazo_Bot",
+"IMDb_Preview",
+"videodirectlinkbot",
+"Mentioned_Videos",
+"timezone_bot",
+"mailmygovNNBot",
+"shhbot",
+"twitterlinkbot"
+];
+
+function disableButtons()
+{
+	$("#tagSubreddit").prop("disabled", true);
+	$("#tagLinkComments").prop("disabled", true);
+	$("#tagList").prop("disabled", true);
+	$("#mergeButton").prop("disabled", true);
+}
+
+function enableButtons()
+{
+	$("#tagSubreddit").prop("disabled", false);
+	$("#tagLinkComments").prop("disabled", false);
+	$("#tagList").prop("disabled", false);
+	$("#mergeButton").prop("disabled", false);
+}
+
+function getSelectValue(id)
+{
+	var i, options, value;
+	options = $("#" + id).prop("options");
+	for (i = 0; i < options.length; i++)
+	{
+		if (options[i].selected) return options[i].value;
+	}
+	return "";
+}
+
+function setSelectValue(id, value)
+{
+	var i, options;
+	options = $("#" + id).prop("options");
+	for (i = 0; i < options.length; i++)
+	{
+		options[i].selected = (options[i].value == value);
+	}
+}
+
+function readSettings(subredditMode)
+{
+	var i, color, pages, minScore, settings;
+	if (subredditMode)
+	{
+		pages = parseInt($("#pages").prop("value"));
+		if (isNaN(pages) || pages < 1) pages = 1;
+		minScore = parseInt($("#score").prop("value"));
+		settings = {subreddit: $("#subreddit").prop("value"),
+					pages: pages,
+					flair: $("#userflair").prop("value"),
+					flairClass: $("#userflairclass").prop("value"),
+					linkSort: getSelectValue("linksort"),
+					commentLinksFrom: getSelectValue("commentlinksfrom"),
+					commentSort: getSelectValue("commentsort"),
+					linkCount: getSelectValue("linkcount"),
+					commentCount: getSelectValue("commentcount"),
+					tagSubmissions: $("#submissions").prop("checked"),
+					tagComments: $("#comments").prop("checked"),
+					tagMods: $("#mods").prop("checked"),
+					includeLink: $("#uselink").prop("checked"),
+					includeFullLink: $("#fullLink").prop("checked")};
+	}
+	else
+	{
+		minScore = parseInt($("#linkscore").prop("value"));
+		settings = {link: $("#link").prop("value"),
+					pages: 1,
+					flair: $("#linkuserflair").prop("value"),
+					flairClass: $("#linkuserflairclass").prop("value"),
+					commentSort: getSelectValue("linkcommentsort"),
+					commentCount: getSelectValue("linkcommentcount"),
+					includeLink: $("#linkuselink").prop("checked"),
+					includeFullLink: $("#linkfullLink").prop("checked")};
+	}
+	settings.userTag = $("#tag").prop("value");
+	color = getSelectValue("color");
+	if (color == "custom") color = "#" + $("#custcolor").prop("value");
+	settings.userColor = color;
+	settings.minScore = (isNaN(minScore) ? 0 : minScore);
+	settings.redditURL = "https://www.reddit.com";
+	settings.crawlDelay = 2000;
+	settings.timeout = 10000;
+	settings.ignore = $("#ignoreList").prop("value").replace(/\"/g, "").replace(/,/g, "\n").split("\n").map(v => v.toLowerCase());
+	return settings;
+}
+
+function tagSubreddit()
+{
+	var settings, jqXHR;
+	settings = readSettings(true);
+	if (settings.userTag == "")
+	{
+		alert("Enter a tag.")
+		$("#tag")[0].focus();
+		return;
+	}
+	if (settings.subreddit == "")
+	{
+		alert("Enter a subreddit.")
+		$("#subreddit")[0].focus();
+		return;
+	}
+	if (!settings.tagSubmissions && !settings.tagComments && !settings.tagMods)
+	{
+		alert("At least one of submissions, comments, or moderators must be tagged.");
+		return;
+	}
+	disableButtons();
+	$("#newTags").prop("value", "");
+	log("Tagging /r/" + settings.subreddit + "...\n", true);
+	$("#stopsubreddit")[0].style.display = "";
+	aborting = false;
+	tagData = {};
+	jqXHR = $.getJSON(settings.redditURL + "/r/" + settings.subreddit + "/about.json?jsonp=?")
+		.always(function(data, status){tagSubredditPage(data, status, settings);});
+	setTimeout(function(jqXHR){jqXHR.abort();}, settings.timeout, jqXHR);
+}
+
+function tagSubredditPage(subredditData, status, settings)
+{
+	var jqXHR;
+	if (aborting)
+	{
+		tagEnd("Stopped.");
+		enableButtons();
+		return;
+	}
+	if (status != "success")
+	{
+		tagEnd("Error.", "Error loading reddit data.");
+		enableButtons();
+		return;
+	}
+	if (subredditData.data) settings.subreddit = subredditData.data.display_name;
+	if (settings.tagSubmissions || settings.tagComments) tagPage(settings, 0, "");
+	if (settings.tagMods)
+	{
+		jqXHR = $.getJSON(settings.redditURL + "/r/" + settings.subreddit + "/about/moderators.json?jsonp=?")
+			.always(function(data, status){tagMods(data, status, settings);});
+		setTimeout(function(jqXHR){jqXHR.abort();}, settings.timeout, jqXHR);
+	}
+}
+
+function tagPage(settings, page, after)
+{
+	var url, jqXHR;
+	log("Page " + (page + 1) + (settings.pages ? " of " + settings.pages : "") + "...\n");
+	url = settings.redditURL + "/r/" + settings.subreddit;
+	if (settings.linkSort != "") url += "/" + settings.linkSort;
+	url += ".json?limit=" + settings.linkCount + "&";
+	if (after != "") url += "after=" + after + "&";
+	if (settings.linkSort == "controversial" || settings.linkSort == "top") url += "t=" + settings.commentLinksFrom + "&";
+	url += "jsonp=?";
+	jqXHR = $.getJSON(url)
+		.always(function(data, status){tagLinks(data, status, settings, page);});
+	setTimeout(function(jqXHR){jqXHR.abort();}, settings.timeout, jqXHR);
+}
+
+function tagLinks(linkData, status, settings, page)
+{
+	var i, linkChildren, data;
+	if (aborting)
+	{
+		tagEnd("Stopped. Tagged " + page + " page(s).");
+		enableButtons();
+		return;
+	}
+	if (status != "success")
+	{
+		tagEnd("Error. Tagged " + page + " page(s).", "Error loading reddit data.");
+		enableButtons();
+		return;
+	}
+	linkChildren = linkData.data.children;
+	for (i = 0; i < linkChildren.length; i++)
+	{
+		data = linkChildren[i].data;
+		if (settings.tagSubmissions && data.author != "[deleted]" && !(settings.ignore.includes(data.author.toLowerCase())) && !tagData["tag."+data.author.toLowerCase()] &&
+			(!settings.minScore || data.score >= settings.minScore) &&
+			(settings.flair == "" || data.author_flair_text == settings.flair) &&
+			(settings.flairClass == "" || data.author_flair_css_class == settings.flairClass))
+		{
+			tagData["tag."+data.author.toLowerCase()] = {text: settings.userTag};
+			if (settings.userColor != "") tagData["tag."+data.author.toLowerCase()].color = settings.userColor;
+			if (settings.includeLink)
+			{
+				if (settings.includeFullLink) tagData["tag."+data.author.toLowerCase()].link = settings.redditURL + data.permalink;
+				else tagData["tag."+data.author.toLowerCase()].link = "https://redd.it/" + data.id;
+			}
+		}
+	}
+	if (settings.tagComments) setTimeout(tagComments, settings.crawlDelay, linkChildren, settings, page, 0, linkData.data.after);
+	else
+	{
+		if (page + 1 >= settings.pages || !linkData.data.after)
+		{
+			/* Finished tagging, show results */
+			tagEnd("Done. Tagged " + (page + 1) + " page(s).");
+			enableButtons();
+		}
+		else setTimeout(tagPage, settings.crawlDelay, settings, page + 1, linkData.data.after);
+	}
+}
+
+function tagComments(linkData, settings, page, link, after)
+{
+	var url, jqXHR;
+	url = settings.redditURL + "/comments/" + linkData[link].data.id + ".json?";
+	if (settings.commentSort != "") url += "sort=" + settings.commentSort + "&";
+	url += "limit=" + settings.commentCount + "&jsonp=?";
+	jqXHR = $.getJSON(url)
+		.always(function(data, status){tagCommentPage(data, status, linkData, settings, page, link, after);});
+	setTimeout(function(jqXHR){jqXHR.abort();}, settings.timeout, jqXHR);
+}
+
+function tagCommentPage(commentData, status, linkData, settings, page, link, after)
+{
+	var i, j, linkCount, commentChildren, permalink;
+	if (aborting)
+	{
+		tagEnd("Stopped. Tagged " + page + " page(s) and " + link + " link(s).");
+		enableButtons();
+		return;
+	}
+	if (status != "success")
+	{
+		tagEnd("Error. Tagged " + page + " page(s) and " + link + " link(s).", "Error loading reddit data.");
+		enableButtons();
+		return;
+	}
+	linkCount = linkData.length;
+	permalink = linkData[link].data.permalink || "";
+	log("Link " + (link + 1) + " of " + linkCount + "...\n");
+	for (i = 0; i < commentData.length; i++)
+	{
+		commentChildren = commentData[i].data.children;
+		for (j = 0; j < commentChildren.length; j++)
+		{
+			permalink = tagComment(commentChildren[j], settings, permalink);
+		}
+	}
+	if (link + 1 >= linkCount)
+	{
+		/* Finished with current page, move to next or finish */
+		if (page + 1 >= settings.pages)
+		{
+			/* Finished tagging, show results */
+			tagEnd("Done. Tagged " + (page + 1) + " page(s).");
+			enableButtons();
+		}
+		else setTimeout(tagPage, settings.crawlDelay, settings, page + 1, after);
+	}
+	else setTimeout(tagComments, settings.crawlDelay, linkData, settings, page, link + 1, after);
+}
+
+function tagComment(comment, settings, permalink)
+{
+	var i, data, children;
+	if (comment.kind == "t1")
+	{
+		data = comment.data;
+		if (data.author != "[deleted]" && !(settings.ignore.includes(data.author.toLowerCase())) && !tagData["tag."+data.author.toLowerCase()] &&
+			(!settings.minScore || data.ups - data.downs >= settings.minScore || data.score_hidden) &&
+			(settings.flair == "" || data.author_flair_text == settings.flair) &&
+			(settings.flairClass == "" || data.author_flair_css_class == settings.flairClass))
+		{
+			tagData["tag."+data.author.toLowerCase()] = {text: settings.userTag};
+			if (settings.userColor != "") tagData["tag."+data.author.toLowerCase()].color = settings.userColor;
+			if (settings.includeLink)
+			{
+				if (settings.includeFullLink && permalink != "") tagData["tag."+data.author.toLowerCase()].link = settings.redditURL + permalink + data.id + "/";
+				else tagData["tag."+data.author.toLowerCase()].link = settings.redditURL + "/r/" + data.subreddit + "/comments/" + data.link_id.substr(3) + "/_/" + data.id + "/";
+			}
+		}
+		if (typeof data.replies == "object")
+		{
+			children = data.replies.data.children;
+			for (i = 0; i < children.length; i++)
+			{
+				tagComment(children[i], settings, permalink);
+			}
+		}
+	}
+	else if (comment.kind == "t3")
+	{
+		return comment.data.permalink;
+	}
+	return permalink;
+}
+
+function tagMods(modData, status, settings)
+{
+	var i, children;
+	if (aborting)
+	{
+		tagEnd("Stopped.");
+		enableButtons();
+		return;
+	}
+	if (status != "success")
+	{
+		tagEnd("Error.", "Error loading reddit data.");
+		enableButtons();
+		return;
+	}
+	children = modData.data.children;
+	for (i = 0; i < children.length; i++)
+	{
+		if (children[i].name != "[deleted]" && !(settings.ignore.includes(children[i].name.toLowerCase())) && !tagData["tag."+children[i].name.toLowerCase()])
+		{
+			tagData["tag."+children[i].name.toLowerCase()] = {text: settings.userTag};
+			if (settings.userColor != "") tagData["tag."+children[i].name.toLowerCase()].color = settings.userColor;
+			if (settings.includeLink) tagData["tag."+children[i].name.toLowerCase()].link = settings.redditURL + "/r/" + settings.subreddit + "/about/moderators";
+		}
+	}
+	if (!settings.tagSubmissions && !settings.tagComments)
+	{
+		/* Finished tagging, show results */
+		tagEnd("Done.");
+		enableButtons();
+	}
+}
+
+function tagLinkComments()
+{
+	var settings, jqXHR, linkData;
+	settings = readSettings(false);
+	if (settings.userTag == "")
+	{
+		alert("Enter a tag.")
+		$("#tag")[0].focus();
+		return;
+	}
+	if (settings.link == "")
+	{
+		alert("Enter a link.")
+		$("#link")[0].focus();
+		return;
+	}
+	disableButtons();
+	linkData = [{data: {id: settings.link}}];
+	$("#newTags").prop("value", "");
+	log("Tagging link comments...\n", true);
+	$("#stoplink")[0].style.display = "";
+	aborting = false;
+	tagData = {};
+	tagComments(linkData, settings, 0, 0, "");
+}
+
+function tagEnd(message, alertMsg)
+{
+	if (alertMsg) alert(alertMsg);
+	$("#newTags").prop("value", JSON.stringify(tagData));
+	log(message);
+	$("#stopsubreddit")[0].style.display = "none";
+	$("#stoplink")[0].style.display = "none";
+}
+
+function abortTagging()
+{
+	aborting = true;
+	log("Aborting...\n");
+}
+
+function tagList()
+{
+	var i, settings, users, user, userCount = 0;
+	settings = readSettings(false);
+	if (settings.userTag == "")
+	{
+		alert("Enter a tag.")
+		$("#tag")[0].focus();
+		return;
+	}
+	disableButtons();
+	log("Tagging list...\n", true);
+	users = $("#userList").prop("value").replace(/\"/g, "").replace(/,/g, "\n").split("\n").map(v => v.toLowerCase());
+	tagData = {};
+	for (i = 0; i < users.length; i++)
+	{
+		user = users[i].trim();
+		if (user.length > 0 && user != "[deleted]" && !(settings.ignore.includes(user.toLowerCase())) && !tagData["tag."+user.toLowerCase()])
+		{
+			tagData["tag."+user.toLowerCase()] = {text: settings.userTag};
+			if (settings.userColor != "") tagData["tag."+user.toLowerCase()].color = settings.userColor;
+			userCount++;
+		}
+	}
+	log("Done. Tagged " + userCount + " user(s).");
+	enableButtons();
+	$("#newTags").prop("value", JSON.stringify(tagData));
+}
+
+function mergeTags()
+{
+	var oldTagData = {}, newTagData, key, subKey, skipTagData = {}, addedUsers = "", skippedUsers = "", numAdded = 0, numSkipped = 0, selectedFile = $("#oldBackup").prop("files")[0];
+	
+	if (selectedFile === undefined)
+	{
+		alert("No RES backup file chosen.");
+		$("#oldBackup")[0].focus();
+		return;
+	}
+	
+	disableButtons();	
+	try
+	{
+		var reader = new FileReader();
+
+		reader.onload = function(event) {
+			var jsonObj = JSON.parse(event.target.result);
+			if (!("data" in jsonObj))
+			{
+				alert("Incompatible backup file.");
+				return;
+			}
+			if (jsonObj.SCHEMA_VERSION != 2)
+			{
+				log("WARNING: Potentially incompatible backup file.", false);
+			}
+			newTagData = $("#newTags").prop("value");
+			if (newTagData == "")
+			{
+				alert("New tag data is empty.");
+				$("#newTags")[0].focus();
+				return;
+			}
+			else
+			{
+				try
+				{
+					if (newTagData.startsWith(",")) newTagData = JSON.parse("{"+newTagData.replace(/^,/,"")+"}");
+					else newTagData = JSON.parse(newTagData);
+				}
+				catch (error)
+				{
+					alert("Invalid new tag data ("+error+"). Please check it is JSON-conformant.");
+					$("#newTags")[0].focus();
+					return;
+				}
+			}
+			replaceold = $("#replaceold").prop("checked");
+			for (key in newTagData)
+			{
+				if (jsonObj.data[key])
+				{
+					if (jsonObj.data[key].text && !replaceold) skipTagData[key] = newTagData[key];
+					else
+					{
+						for (subKey in newTagData[key])
+						{
+							if (!jsonObj.data[key][subKey] || replaceold)
+							{
+								jsonObj.data[key][subKey] = newTagData[key][subKey];
+								if (subKey == "text")
+								{
+									addedUsers += key.replace(/^tag\./,"") + "\n";
+									numAdded++;
+								}
+							}
+							else
+							{
+								if (!skipTagData[key]) skipTagData[key] = {};
+								skipTagData[key][subKey] = newTagData[key][subKey];
+							}
+						}
+					}
+				}
+				else
+				{
+					jsonObj.data[key] = newTagData[key];
+					addedUsers += key.replace(/^tag\./,"") + "\n";
+					numAdded++;
+				}
+			}
+			for (key in skipTagData)
+			{
+				skippedUsers += key.replace(/^tag\./,"") + "\n";
+				numSkipped++;
+			}
+			log("Added users:\n==============================================\n" + addedUsers + "\nSkipped users:\n==============================================\n" + skippedUsers + "\n" + numAdded +	 " added, " + numSkipped + " skipped.", true);
+			if (numAdded > 0)
+			{
+				log("\nSaving new backup file...", false)
+				var blob = new Blob([JSON.stringify(jsonObj)], {type: "text/plain;charset=utf-8"});
+				saveAs(blob, selectedFile.name);
+			}
+			else
+			{
+				log("\nNo new users compared to RES backup file.", false)
+			}
+			$("#oldBackupForm")[0].reset();
+		}
+		reader.readAsText(selectedFile);
+	}
+	catch (error)
+	{
+		log("Error parsing tag data" + (error.message? ":\n" + error.message : "."), true);
+	}
+	enableButtons();
+}
+
+function log(text, overwrite)
+{
+	var element, length;
+	element = $("#messages")[0];
+	if (overwrite) element.value = text;
+	else element.value += text;
+	length = element.value.length;
+	element.setSelectionRange(length, length);
+	element.scrollTop = element.scrollHeight;
+}
+
+function toggleCollapse(element)
+{
+	var style = element.parentNode.nextElementSibling.nextElementSibling.style;
+	if (style.display == "none")
+	{
+		style.display = "";
+		element.textContent	= "[-]";
+		element.title	= "Collapse section";
+	}
+	else
+	{
+		style.display = "none";
+		element.textContent	= "[+]";
+		element.title	= "Expand section";
+	}
+}
+
+function updateBG(element)
+{
+	var i, options;
+	if (!element) return;
+	options = element.options;
+	for (i = 0; i < options.length; i++)
+	{
+		if (options[i].selected)
+		{
+			if (element.id == "color") $("#custcolorline")[0].style.display = (options[i].value == "custom" ? "" : "none");
+			element.style.color = options[i].style.color;
+			element.style.backgroundColor = options[i].style.backgroundColor;
+			break;
+		}
+	}
+}
+
+function updateLinksFrom()
+{
+	var value = getSelectValue("linksort");
+	$("#linksfrom")[0].style.display = (value == "controversial" || value == "top" ? "" : "none");
+}
+
+function getSavedTagOptions()
+{
+	var i, cookie, savedTag;
+	savedTagOptions = [];
+	for (i = 0; ; i++)
+	{
+		cookie = docCookies.getItem("savedTag" + i);
+		if (cookie == null || cookie == "") break;
+		try
+		{
+			savedTag = JSON.parse(cookie);
+		}
+		catch (error)
+		{
+			break;
+		}
+		savedTagOptions[i] = savedTag;
+		addSavedTagOption(true, savedTag, i, false);
+	}
+}
+
+function setSavedTagOptions()
+{
+	var i;
+	for (i = 0; i < savedTagOptions.length + 1; i++)
+	{
+		docCookies.removeItem("savedTag" + i);
+	}
+	for (i = 0; i < savedTagOptions.length; i++)
+	{
+		docCookies.setItem("savedTag" + i, JSON.stringify(savedTagOptions[i]), Infinity);
+	}
+}
+
+function addSavedTagOption(newOption, options, value, select)
+{
+	var i, element, option;
+	element = $("#tagoptions")[0];
+	if (newOption) option = document.createElement("option");
+	else
+	{
+		for (i = 0; i < element.options.length; i++)
+		{
+			if (element.options[i].selected)
+			{
+				option = element.options[i];
+				break;
+			}
+		}
+		if (!option) return;
+	}
+	if (options.userColor) option.style.backgroundColor = options.userColor;
+	else option.style.backgroundColor = "white";
+	option.style.color = ({"black": 1, "blue": 1, "cornflowerblue": 1, "fuchsia": 1, "gray": 1, "green": 1, "maroon": 1, "navy": 1, "olive": 1, "orange": 1, "orangered": 1, "purple": 1, "red": 1, "teal": 1}[options.userColor] ? "white" : "black");
+	option.value = value;
+	option.text = options.userTag + " (/r/" + options.subreddit + ")";
+	if (select) option.selected = true;
+	if (newOption) element.add(option);
+	if (select)
+	{
+		element.style.color = option.style.color;
+		element.style.backgroundColor = option.style.backgroundColor;
+	}
+}
+
+function tagOptionLoad()
+{
+	var index, options;
+	index = getSelectValue("tagoptions");
+	if (index < 0) return;
+	options = savedTagOptions[index];
+	if (!options) return;
+	$("#subreddit").prop("value", options.subreddit);
+	$("#pages").prop("value", options.pages);
+	$("#score").prop("value", options.minScore);
+	$("#userflair").prop("value", options.flair);
+	$("#userflairclass").prop("value", options.flairClass);
+	setSelectValue("linksort", options.linkSort);
+	setSelectValue("commentlinksfrom", options.commentLinksFrom);
+	setSelectValue("commentsort", options.commentSort);
+	setSelectValue("linkcount", options.linkCount);
+	setSelectValue("commentcount", options.commentCount);
+	$("#submissions").prop("checked", options.tagSubmissions);
+	$("#comments").prop("checked", options.tagComments);
+	$("#mods").prop("checked", options.tagMods);
+	$("#uselink").prop("checked", options.includeLink);
+	$("#fullLink").prop("checked", options.includeFullLink);
+	$("#tag").prop("value", options.userTag);
+	if (options.userColor.charAt(0) == "#")
+	{
+		setSelectValue("color", "custom");
+		$("#custcolor").prop("value", options.userColor.substr(1));
+		$("#custcolor")[0].color.importColor();
+	}
+	else setSelectValue("color", options.userColor);
+	updateBG($("#color")[0]);
+	updateLinksFrom();
+}
+
+function tagOptionSave()
+{
+	var color, options, element, index;
+	color = getSelectValue("color");
+	if (color == "custom") color = "#" + $("#custcolor").prop("value");
+	options = {subreddit: $("#subreddit").prop("value"),
+			   pages: $("#pages").prop("value"),
+			   minScore: $("#score").prop("value"),
+			   flair: $("#userflair").prop("value"),
+			   flairClass: $("#userflairclass").prop("value"),
+			   linkSort: getSelectValue("linksort"),
+			   commentLinksFrom: getSelectValue("commentlinksfrom"),
+			   commentSort: getSelectValue("commentsort"),
+			   linkCount: getSelectValue("linkcount"),
+			   commentCount: getSelectValue("commentcount"),
+			   tagSubmissions: $("#submissions").prop("checked"),
+			   tagComments: $("#comments").prop("checked"),
+			   tagMods: $("#mods").prop("checked"),
+			   includeLink: $("#uselink").prop("checked"),
+			   includeFullLink: $("#fullLink").prop("checked"),
+			   userTag: $("#tag").prop("value"),
+			   userColor: color};
+	element = $("#tagoptions")[0];
+	index = element.selectedIndex;
+	if (element.options[0].selected) addSavedTagOption(true, options, savedTagOptions.length, true);
+	else
+	{
+		if (!confirm("Overwrite saved tag " + element.options[index].text + "?")) return;
+		addSavedTagOption(false, options, index - 1, true);
+	}
+	savedTagOptions[element.selectedIndex - 1] = options;
+	setSavedTagOptions();
+}
+
+function tagOptionDelete()
+{
+	var i, element, index, newSavedTagOptions = [];
+	element = $("#tagoptions")[0];
+	index = element.selectedIndex;
+	if (index < 1) return;
+	if (!confirm("Delete saved tag " + element.options[index].text + "?")) return;
+	for (i = 0; i < savedTagOptions.length; i++)
+	{
+		element.remove(1);
+	}
+	for (i = 0; i < savedTagOptions.length; i++)
+	{
+		if (i != index - 1)
+		{
+			newSavedTagOptions.push(savedTagOptions[i]);
+			addSavedTagOption(true, savedTagOptions[i], newSavedTagOptions.length - 1, false);
+		}
+	}
+	savedTagOptions = newSavedTagOptions;
+	setSavedTagOptions();
+	updateBG($("#tagoptions")[0]);
+	updateLinksFrom();
+}
+</script>
+<div class="help">
+<div class="helpExpand block"><a title="Collapse section" onclick="toggleCollapse(this);">[-]</a></div><div class="helpTitle">About &amp; Instructions</div>
+<div class="helpContent">
+User tagger for <a href="https://redditenhancementsuite.com/">Reddit Enhancement Suite</a> originally by absurdlyobfuscated, edited January 2018 for compatibility with RES backup files and other fixes. Everything is done in-browser with JavaScript and the reddit JSON API.<br>
+<br>
+<div class="bold">Subreddit Tagger</div>: Given a subreddit, loads the specified number of pages from reddit and tags any or all of submitters, commenters, and/or moderators. Tag settings can be saved and loaded, and are stored as a cookie in your browser. The only required field is the subreddit; pages will default to 1 if empty, and the score and flair fields are only used to further restrict which users are tagged.<br>
+<br>
+<div class="bold">Link Comment Tagger</div>: Given the ID of a reddit link, loads page from reddit and tags all commenters. Score and flair fields are optional.<br>
+<br>
+<div class="bold">List Tagger</div>: Tags each username in a list of usernames. Usernames should be on separate lines or separated by commas.<br>
+<br>
+<div class="bold">Ignore List</div>: Avoids tagging each username in the list while generating tags. Usernames should be on separate lines or separated by commas. Default is a list of bots.<br>
+<br>
+<div class="bold">Tag Merger</div>: Merges a set of new tags with your RES tags. After tagging a subreddit or a list, go into your <a href="https://www.reddit.com/#res:settings/backupAndRestore">RES settings console</a> and backup your settings to a file. Select your backup file in the 'Choose file' input below and click 'Merge Tags'. A new backup file with both your original tags and the new tags will be saved. In your RES settings console click restore and select the new backup file. Any users that you have already tagged will not be modified as long as 'Replace conflicting tags' is unchecked, and vote weights will be unaffected if a user is tagged, and all other RES settings should be unaffected. Tags from other sources, including <a href="https://www.reddit.com/r/masstagger/comments/78gtap/res_broke_mass_tagging_so_i_made_my_own/">/u/morpen's tag lists</a>, may also be pasted into the 'New Tags' box to merge arbitrary sets of tags with your RES backup file. <br><i>(note: the tag merger ignores the boxes on the left once the tags are already generated).</i>
+</div>
+</div>
+<div class="tags">
+<div class="optLine">
+<div class="tagLbl">Tag Text:</div><div class="tagInput"><input id="tag" type="text"></div>
+</div>
+<div class="optLine">
+<div class="tagLbl">Tag Color:</div><div class="tagInput"><select id="color" onchange="updateBG(this);" style="color: black; background-color: white;">
+<option value="" style="background-color: white; color: black;">none</option>
+<option value="aqua" style="background-color: aqua; color: black;">aqua</option>
+<option value="black" style="background-color: black; color: white;">black</option>
+<option value="blue" style="background-color: blue; color: white;">blue</option>
+<option value="cornflowerblue" style="background-color: cornflowerblue; color: white;">cornflowerblue</option>
+<option value="fuchsia" style="background-color: fuchsia; color: white;">fuchsia</option>
+<option value="gray" style="background-color: gray; color: white;">gray</option>
+<option value="green" style="background-color: green; color: white;">green</option>
+<option value="lime" style="background-color: lime; color: black;">lime</option>
+<option value="maroon" style="background-color: maroon; color: white;">maroon</option>
+<option value="navy" style="background-color: navy; color: white;">navy</option>
+<option value="olive" style="background-color: olive; color: white;">olive</option>
+<option value="orange" style="background-color: orange; color: white;">orange</option>
+<option value="orangered" style="background-color: orangered; color: white;">orangered</option>
+<option value="pink" style="background-color: pink; color: black;">pink</option>
+<option value="purple" style="background-color: purple; color: white;">purple</option>
+<option value="red" style="background-color: red; color: white;">red</option>
+<option value="silver" style="background-color: silver; color: black;">silver</option>
+<option value="teal" style="background-color: teal; color: white;">teal</option>
+<option value="white" style="background-color: white; color: black;">white</option>
+<option value="yellow" style="background-color: yellow; color: black;">yellow</option>
+<option value="custom" style="background-color: white; color: black;">custom</option>
+</select></div>
+</div>
+<div id="custcolorline" class="optLine" style="display: none;">
+<div class="tagLbl">Custom Color:</div><div class="tagInput"><input id="custcolor" class="color" type="text" autocomplete="off" style="background-image: none; background-color: rgb(255, 255, 255); color: rgb(0, 0, 0);"></div>
+</div>
+</div>
+<div class="mainSection">
+<hr class="separator">
+<div class="tagSection">
+<div class="title center">Subreddit Tagger</div>
+<div class="saveOptLine center">
+<div class="saveOptLbl center">Manage Subreddit Tagger Options:</div><div class="saveOptInput"><select id="tagoptions" onchange="updateBG(this);"><option value="-1" style="background-color: white; color: black;">-New-</option></select></div><div class="saveOptBtns"><input type="button" onclick="tagOptionLoad();" value="Load"><input type="button" onclick="tagOptionSave();" value="Save"><input type="button" onclick="tagOptionDelete();" value="Delete"></div>
+</div>
+<div class="optLine" title="Name of subreddit, e.g., &#39;pics&#39; or &#39;funny&#39;.">
+<div class="optLbl">Subreddit:</div><div class="optInput"><input id="subreddit" type="text"></div>
+</div>
+<div class="optLine" title="Number of pages to load.">
+<div class="optLbl">Pages:</div><div class="optInput"><input id="pages" type="text"></div>
+</div>
+<div class="optLine" title="Score that must be met for submitters or commenters to be tagged. 0 or blank for no minimum.">
+<div class="optLbl">Minimum Score:</div><div class="optInput"><input id="score" type="text"></div>
+</div>
+<div class="optLine" title="Flair that users must have selected for them to be tagged. Blank for no flair restrictions.">
+<div class="optLbl">User Flair:</div><div class="optInput"><input id="userflair" type="text"></div>
+</div>
+<div class="optLine" title="Flair CSS class that users must have selected for them to be tagged. Blank for no flair restrictions.">
+<div class="optLbl">User Flair Class:</div><div class="optInput"><input id="userflairclass" type="text"></div>
+</div>
+<div class="optLine">
+<div class="optLbl">Link Sort Method:</div><div class="optInput"><select id="linksort" onchange="updateLinksFrom();">
+<option value="">hot</option>
+<option value="new">new</option>
+<option value="rising">rising</option>
+<option value="controversial">controversial</option>
+<option value="top">top</option>
+</select></div>
+</div>
+<div id="linksfrom" class="optLine" style="display: none;">
+<div class="optLbl">Show Links From:</div><div class="optInput"><select id="commentlinksfrom">
+<option value="hour">this hour</option>
+<option value="day" selected="selected">today</option>
+<option value="week">this week</option>
+<option value="month">this month</option>
+<option value="year">this year</option>
+<option value="all">all time</option>
+</select></div>
+</div>
+<div class="optLine" title="The amount of posts per page, excluding stickied ones.">
+<div class="optLbl">Links Per Page:</div><div class="optInput"><select id="linkcount">
+<option value="10">10</option>
+<option value="25" selected="selected">25</option>
+<option value="50">50</option>
+<option value="100">100</option>
+</select></div>
+</div>
+<div class="optLine">
+<div class="optLbl">Comment Sort Method:</div><div class="optInput"><select id="commentsort">
+<option value="confidence">best</option>
+<option value="top">top</option>
+<option value="new">new</option>
+<option value="hot">hot</option>
+<option value="controversial">controversial</option>
+<option value="old">old</option>
+</select></div>
+</div>
+<div class="optLine">
+<div class="optLbl">Comments Per Page:</div><div class="optInput"><select id="commentcount">
+<option value="200">200</option>
+<option value="500" selected="selected">500</option>
+</select></div>
+</div>
+<div class="optLine">
+<div class="optLblW"><input id="submissions" type="checkbox" checked="checked"><label for="submissions">Tag Submitters</label></div>
+</div>
+<div class="optLine">
+<div class="optLblW"><input id="comments" type="checkbox" checked="checked"><label for="comments">Tag Commenters</label></div>
+</div>
+<div class="optLine">
+<div class="optLblW"><input id="mods" type="checkbox"><label for="mods">Tag Moderators</label></div>
+</div>
+<div class="optLine" title="Adds a link to the comment or submission each user is tagged in. Unless &#39;Use Full Link Data in Tags&#39; is checked, short URLs are used to save space, e.g., https://redd.it/xxxxxx for submissions and https://www.reddit.com/r/subreddit/comments/xxxxxx/_/yyyyyy for comments (title is omitted).">
+<div class="optLblW"><input id="uselink" type="checkbox"><label for="uselink">Include Link Data in Tags</label></div>
+</div>
+<div class="optLine" title="Links in tags use full reddit URL, e.g., https://www.reddit.com/r/subreddit/comments/xxxxxx/submission_title/yyyyyy.">
+<div class="optLblW"><input id="fullLink" type="checkbox"><label for="fullLink">Use Full Link Data in Tags</label></div>
+</div>
+<div class="optLine">
+<div class="optLblW center padTop"><input type="button" id="tagSubreddit" onclick="tagSubreddit();" value="Tag Subreddit"></div>
+<div id="stopsubreddit" class="optLblW center padTop" style="display: none;"><input type="button" onclick="abortTagging();" value="Stop"></div>
+</div>
+</div>
+<hr class="separator">
+<div class="tagSection">
+<div class="title center">Link Comment Tagger</div>
+<div class="optLine" title="Link ID, the xxxxxx in a link URL: https://www.reddit.com/r/subreddit/comments/xxxxxx/submission_title/">
+<div class="optLbl">Link ID:</div><div class="optInput"><input id="link" type="text"></div>
+</div>
+<div class="optLine" title="Score that must be met for commenters to be tagged. 0 or blank for no minimum.">
+<div class="optLbl">Minimum Score:</div><div class="optInput"><input id="linkscore" type="text"></div>
+</div>
+<div class="optLine" title="Flair that users must have selected for them to be tagged. Blank for no flair restrictions.">
+<div class="optLbl">User Flair:</div><div class="optInput"><input id="linkuserflair" type="text"></div>
+</div>
+<div class="optLine" title="Flair CSS class that users must have selected for them to be tagged. Blank for no flair restrictions.">
+<div class="optLbl">User Flair Class:</div><div class="optInput"><input id="linkuserflairclass" type="text"></div>
+</div>
+<div class="optLine">
+<div class="optLbl">Comment Sort Method:</div><div class="optInput"><select id="linkcommentsort">
+<option value="confidence">best</option>
+<option value="top">top</option>
+<option value="new">new</option>
+<option value="hot">hot</option>
+<option value="controversial">controversial</option>
+<option value="old">old</option>
+</select></div>
+</div>
+<div class="optLine">
+<div class="optLbl">Comment Limit:</div><div class="optInput"><select id="linkcommentcount" title="Number of comments to load per comment page.">
+<option value="200">200</option>
+<option value="500" selected="selected">500</option>
+</select></div>
+</div>
+<div class="optLine" title="Adds a link to the comment or submission each user is tagged in. Unless &#39;Use Full Link Data in Tags&#39; is checked, short URLs are used to save space, e.g., https://redd.it/xxxxxx for submissions and https://www.reddit.com/r/subreddit/comments/xxxxxx/_/yyyyyy for comments (title is omitted).">
+<div class="optLblW"><input id="linkuselink" type="checkbox"><label for="linkuselink">Include Link Data in Tags</label></div>
+</div>
+<div class="optLine" title="Links in tags use full reddit URL, e.g., https://www.reddit.com/r/subreddit/comments/xxxxxx/submission_title/yyyyyy.">
+<div class="optLblW"><input id="linkfullLink" type="checkbox"><label for="linkfullLink">Use Full Link Data in Tags</label></div>
+</div>
+<div class="optLine">
+<div class="optLblW center padTop"><input type="button" id="tagLinkComments" onclick="tagLinkComments();" value="Tag Link Comments"></div>
+<div id="stoplink" class="optLblW center padTop hidden" style="display: none;"><input type="button" onclick="abortTagging();" value="Stop"></div>
+</div>
+</div>
+<hr class="separator">
+<div class="tagSection">
+<div class="title center">List Tagger</div>
+<div class="optLine">
+<textarea id="userList"></textarea>
+</div>
+<div class="optLine">
+<div class="optLblW center padTop"><input type="button" id="tagList" onclick="tagList();" value="Tag List"></div>
+</div>
+</div>
+<hr class="separator">
+<div class="tagSection">
+<div class="title center">Ignore List</div>
+<div class="optLine">
+<textarea id="ignoreList"></textarea>
+</div>
+</div>
+</div>
+<div class="mainSection">
+<div class="outSection">
+<div class="lbl">Status/Messages</div>
+<textarea id="messages" readonly></textarea>
+<div class="lbl">New Tags</div>
+<textarea id="newTags"></textarea>
+<div class="lbl">Upload your RES backup file here</div><br>
+<form id="oldBackupForm"><input id="oldBackup" type="file" accept=".resbackup"><br><br>
+<div class="optLine" title="Replaces conflicting old tags with the new tags">
+<div><input id="replaceold" type="checkbox"><label for="replaceold">Replace conflicting tags</label></div>
+</div></form><br>
+<input type="button" id="mergeButton" onclick="mergeTags();" value="Merge Tags">
+</div>
+</div>
+</div>
+</body></html>
