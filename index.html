@@ -806,7 +806,7 @@ function addSavedTagOption(newOption, options, value, select)
 	option.value = value;
 	var displayName = "/r/" + options.subreddit;
 	var multiTag = options.subreddit.match(multiRegex);
-	if (multiTag) displayName = "/user/" + multiRe[4] + "/m/" + multiRe[5];
+	if (multiTag) displayName = "/user/" + multiTag[4] + "/m/" + multiTag[5];
 	option.text = options.userTag + " (" + displayName + ")";
 	if (select) option.selected = true;
 	if (newOption) element.add(option);
