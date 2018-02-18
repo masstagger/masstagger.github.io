@@ -88,7 +88,7 @@ updateBG($("#color")[0]);
 updateLinksFrom();
 getSavedTagOptions();});
 							 
-var tagData, savedTagOptions = [], aborting = false, bots = [
+var tagData, savedTagOptions = [], aborting = false, multiRegex = /^(https?:\/\/[\w\d]+\.reddit\.com)?(\/)?(user|u)\/([\w\d]+)\/m\/([\w\d]+)(\/|$)/, bots = [
 "AutoModerator",
 "TotesMessenger",
 "totes_meta_bot",
@@ -183,7 +183,9 @@ var tagData, savedTagOptions = [], aborting = false, bots = [
 "timezone_bot",
 "mailmygovNNBot",
 "shhbot",
-"twitterlinkbot"
+"twitterlinkbot",
+"BOTS_RISE_UP",
+"BigLebowskiBot"
 ];
 
 function disableButtons()
@@ -291,20 +293,15 @@ function tagSubreddit()
 		alert("At least one of submissions, comments, or moderators must be tagged.");
 		return;
 	}
-	multiRe = settings.subreddit.match(/^(https?:\/\/[\w\d]+\.reddit\.com)?(\/)?(user|u)\/([\w\d]+)\/m\/([\w\d]+)(\/|$)/);
+	multiRe = settings.subreddit.match(multiRegex);
 	disableButtons();
 	$("#newTags").prop("value", "");
 	var displayName = "/r/" + settings.subreddit;
 	var about = settings.redditURL + "/r/" + settings.subreddit + "/about.json?jsonp=?";
 	if (multiRe)
 	{
-		multiUrl = multiRe[0];
-		if (!multiRe[1])
-		{
-			if (!multiRe[2]) multiUrl = "/" + multiUrl;
-			multiUrl = settings.redditURL + multiUrl;
-		}
 		displayName = "/user/" + multiRe[4] + "/m/" + multiRe[5];
+		multiUrl = settings.redditURL + displayName;
 		about = multiUrl + ".json?jsonp=?";
 	}
 	log("Tagging " + displayName + "...\n", true);
@@ -808,7 +805,8 @@ function addSavedTagOption(newOption, options, value, select)
 	option.style.color = ({"black": 1, "blue": 1, "cornflowerblue": 1, "fuchsia": 1, "gray": 1, "green": 1, "maroon": 1, "navy": 1, "olive": 1, "orange": 1, "orangered": 1, "purple": 1, "red": 1, "teal": 1}[options.userColor] ? "white" : "black");
 	option.value = value;
 	var displayName = "/r/" + options.subreddit;
-	if (options.subreddit.match(/\/?user\//)) displayName = options.subreddit;
+	var multiTag = options.subreddit.match(multiRegex);
+	if (multiTag) displayName = "/user/" + multiRe[4] + "/m/" + multiRe[5];
 	option.text = options.userTag + " (" + displayName + ")";
 	if (select) option.selected = true;
 	if (newOption) element.add(option);
