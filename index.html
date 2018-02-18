@@ -310,7 +310,7 @@ function tagSubreddit()
 	log("Tagging " + displayName + "...\n", true);
 	$("#stopsubreddit")[0].style.display = "";
 	aborting = false;
-	tagData = {}
+	tagData = {};
 	jqXHR = $.getJSON(about)
 		.always(function(data, status){tagSubredditPage(data, status, settings);});
 	setTimeout(function(jqXHR){jqXHR.abort();}, settings.timeout, jqXHR);
