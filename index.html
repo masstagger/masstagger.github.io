@@ -291,13 +291,27 @@ function tagSubreddit()
 		alert("At least one of submissions, comments, or moderators must be tagged.");
 		return;
 	}
+	multiRe = settings.subreddit.match(/^(https?:\/\/[\w\d]+\.reddit\.com)?(\/)?(user|u)\/([\w\d]+)\/m\/([\w\d]+)(\/|$)/);
 	disableButtons();
 	$("#newTags").prop("value", "");
-	log("Tagging /r/" + settings.subreddit + "...\n", true);
+	var displayName = "/r/" + settings.subreddit;
+	var about = settings.redditURL + "/r/" + settings.subreddit + "/about.json?jsonp=?";
+	if (multiRe)
+	{
+		multiUrl = multiRe[0];
+		if (!multiRe[1])
+		{
+			if (!multiRe[2]) multiUrl = "/" + multiUrl;
+			multiUrl = settings.redditURL + multiUrl;
+		}
+		displayName = "/user/" + multiRe[4] + "/m/" + multiRe[5];
+		about = multiUrl + ".json?jsonp=?";
+	}
+	log("Tagging " + displayName + "...\n", true);
 	$("#stopsubreddit")[0].style.display = "";
 	aborting = false;
-	tagData = {};
-	jqXHR = $.getJSON(settings.redditURL + "/r/" + settings.subreddit + "/about.json?jsonp=?")
+	tagData = {}
+	jqXHR = $.getJSON(about)
 		.always(function(data, status){tagSubredditPage(data, status, settings);});
 	setTimeout(function(jqXHR){jqXHR.abort();}, settings.timeout, jqXHR);
 }
@@ -319,7 +333,7 @@ function tagSubredditPage(subredditData, status, settings)
 	}
 	if (subredditData.data) settings.subreddit = subredditData.data.display_name;
 	if (settings.tagSubmissions || settings.tagComments) tagPage(settings, 0, "");
-	if (settings.tagMods)
+	if (settings.tagMods && !multiRe)
 	{
 		jqXHR = $.getJSON(settings.redditURL + "/r/" + settings.subreddit + "/about/moderators.json?jsonp=?")
 			.always(function(data, status){tagMods(data, status, settings);});
@@ -332,6 +346,7 @@ function tagPage(settings, page, after)
 	var url, jqXHR;
 	log("Page " + (page + 1) + (settings.pages ? " of " + settings.pages : "") + "...\n");
 	url = settings.redditURL + "/r/" + settings.subreddit;
+	if (multiRe) url = multiUrl;
 	if (settings.linkSort != "") url += "/" + settings.linkSort;
 	url += ".json?limit=" + settings.linkCount + "&";
 	if (after != "") url += "after=" + after + "&";
@@ -900,7 +915,7 @@ function tagOptionDelete()
 <div class="helpContent">
 User tagger for <a href="https://redditenhancementsuite.com/">Reddit Enhancement Suite</a> originally by absurdlyobfuscated, edited January 2018 for compatibility with RES backup files and other fixes. Everything is done in-browser with JavaScript and the reddit JSON API.<br>
 <br>
-<div class="bold">Subreddit Tagger</div>: Given a subreddit, loads the specified number of pages from reddit and tags any or all of submitters, commenters, and/or moderators. Tag settings can be saved and loaded, and are stored as a cookie in your browser. The only required field is the subreddit; pages will default to 1 if empty, and the score and flair fields are only used to further restrict which users are tagged.<br>
+<div class="bold">Subreddit Tagger</div>: Given a subreddit, loads the specified number of pages from reddit and tags any or all of submitters, commenters, and/or moderators. Multireddits are also supported if you paste the full URL into the subreddit box. Tag settings can be saved and loaded, and are stored as a cookie in your browser. The only required field is the subreddit; pages will default to 1 if empty, and the score and flair fields are only used to further restrict which users are tagged.<br>
 <br>
 <div class="bold">Link Comment Tagger</div>: Given the ID of a reddit link, loads page from reddit and tags all commenters. Score and flair fields are optional.<br>
 <br>
@@ -952,7 +967,7 @@ User tagger for <a href="https://redditenhancementsuite.com/">Reddit Enhancement
 <div class="saveOptLine center">
 <div class="saveOptLbl center">Manage Subreddit Tagger Options:</div><div class="saveOptInput"><select id="tagoptions" onchange="updateBG(this);"><option value="-1" style="background-color: white; color: black;">-New-</option></select></div><div class="saveOptBtns"><input type="button" onclick="tagOptionLoad();" value="Load"><input type="button" onclick="tagOptionSave();" value="Save"><input type="button" onclick="tagOptionDelete();" value="Delete"></div>
 </div>
-<div class="optLine" title="Name of subreddit, e.g., &#39;pics&#39; or &#39;funny&#39;.">
+<div class="optLine" title="Name of subreddit, e.g., &#39;pics&#39; or &#39;funny&#39;, or full URL for multireddits.">
 <div class="optLbl">Subreddit:</div><div class="optInput"><input id="subreddit" type="text"></div>
 </div>
 <div class="optLine" title="Number of pages to load.">
@@ -1016,7 +1031,7 @@ User tagger for <a href="https://redditenhancementsuite.com/">Reddit Enhancement
 <div class="optLine">
 <div class="optLblW"><input id="comments" type="checkbox" checked="checked"><label for="comments">Tag Commenters</label></div>
 </div>
-<div class="optLine">
+<div class="optLine" title="Does not work for multireddits">
 <div class="optLblW"><input id="mods" type="checkbox"><label for="mods">Tag Moderators</label></div>
 </div>
 <div class="optLine" title="Adds a link to the comment or submission each user is tagged in. Unless &#39;Use Full Link Data in Tags&#39; is checked, short URLs are used to save space, e.g., https://redd.it/xxxxxx for submissions and https://www.reddit.com/r/subreddit/comments/xxxxxx/_/yyyyyy for comments (title is omitted).">
