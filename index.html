@@ -807,7 +807,9 @@ function addSavedTagOption(newOption, options, value, select)
 	else option.style.backgroundColor = "white";
 	option.style.color = ({"black": 1, "blue": 1, "cornflowerblue": 1, "fuchsia": 1, "gray": 1, "green": 1, "maroon": 1, "navy": 1, "olive": 1, "orange": 1, "orangered": 1, "purple": 1, "red": 1, "teal": 1}[options.userColor] ? "white" : "black");
 	option.value = value;
-	option.text = options.userTag + " (/r/" + options.subreddit + ")";
+	var displayName = "/r/" + options.subreddit;
+	if (options.subreddit.match(/\/?user\//)) displayName = options.subreddit;
+	option.text = options.userTag + " (" + displayName + ")";
 	if (select) option.selected = true;
 	if (newOption) element.add(option);
 	if (select)
