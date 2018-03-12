@@ -185,7 +185,9 @@ var tagData, savedTagOptions = [], aborting = false, multiRegex = /^(https?:\/\/
 "shhbot",
 "twitterlinkbot",
 "BOTS_RISE_UP",
-"BigLebowskiBot"
+"BigLebowskiBot",
+"Darnit_Bot",
+"Subjunctive__Bot"
 ];
 
 function disableButtons()
@@ -803,10 +805,14 @@ function addSavedTagOption(newOption, options, value, select)
 	if (options.userColor) option.style.backgroundColor = options.userColor;
 	else option.style.backgroundColor = "white";
 	option.style.color = ({"black": 1, "blue": 1, "cornflowerblue": 1, "fuchsia": 1, "gray": 1, "green": 1, "maroon": 1, "navy": 1, "olive": 1, "orange": 1, "orangered": 1, "purple": 1, "red": 1, "teal": 1}[options.userColor] ? "white" : "black");
-	option.value = value;
 	var displayName = "/r/" + options.subreddit;
 	var multiTag = options.subreddit.match(multiRegex);
-	if (multiTag) displayName = "/user/" + multiTag[4] + "/m/" + multiTag[5];
+	if (multiTag)
+	{
+		displayName = "/user/" + multiTag[4] + "/m/" + multiTag[5];
+		option.value = displayName;
+	}
+	else option.value = value;
 	option.text = options.userTag + " (" + displayName + ")";
 	if (select) option.selected = true;
 	if (newOption) element.add(option);
@@ -913,7 +919,7 @@ function tagOptionDelete()
 <div class="help">
 <div class="helpExpand block"><a title="Collapse section" onclick="toggleCollapse(this);">[-]</a></div><div class="helpTitle">About &amp; Instructions</div>
 <div class="helpContent">
-User tagger for <a href="https://redditenhancementsuite.com/">Reddit Enhancement Suite</a> originally by absurdlyobfuscated, edited January 2018 for compatibility with RES backup files and other fixes. Everything is done in-browser with JavaScript and the reddit JSON API.<br>
+User tagger for <a href="https://redditenhancementsuite.com/">Reddit Enhancement Suite</a> originally by absurdlyobfuscated, edited January 2018 for compatibility with RES backup files and other fixes. The tags are generated using JavaScript and the reddit JSON API.<br>
 <br>
 <div class="bold">Subreddit Tagger</div>: Given a subreddit, loads the specified number of pages from reddit and tags any or all of submitters, commenters, and/or moderators. Multireddits are also supported if you paste the full URL into the subreddit box. Tag settings can be saved and loaded, and are stored as a cookie in your browser. The only required field is the subreddit; pages will default to 1 if empty, and the score and flair fields are only used to further restrict which users are tagged.<br>
 <br>
